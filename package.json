@@ -1,6 +1,6 @@
 {
   "name": "image2tags",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An npm package that generates keywords from an image",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
