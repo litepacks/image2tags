@@ -11,17 +11,26 @@ interface Tag {
   probability: number;
 }
 
+let modelCache: mobilenet.MobileNet | null = null;
+
+async function loadModel(): Promise<mobilenet.MobileNet> {
+  if (!modelCache) {
+    modelCache = await mobilenet.load();
+  }
+  return modelCache;
+}
+
 export async function getImageTags(imagePath: string, topK = 10): Promise<Tag[]> {
   try {
     const image = await readFile(imagePath);
     const imageTensor = tf.node.decodeImage(new Uint8Array(image), 3) as tf.Tensor3D;
 
-    const model = await mobilenet.load();
+    const model = await loadModel();
     const predictions = await model.classify(imageTensor);
 
-    const processedPredictions = predictions.map(p => ({
+    const processedPredictions = predictions.map((p: { className: string; probability: number }) => ({
       ...p,
-      tags: p.className.split(',').map(s => s.trim()),
+      tags: p.className.split(',').map((s: string) => s.trim()),
     }));
 
     return processedPredictions.slice(0, topK);

@@ -6,13 +6,18 @@ import * as path from 'path';
 
 const program = new Command();
 
+interface CliOptions {
+  topK: string;
+  json?: boolean;
+}
+
 program
   .version('1.0.0')
   .description('A CLI tool to get tags for a given image.')
   .argument('<imagePath>', 'Path to the image file.')
   .option('-k, --topK <number>', 'Number of top predictions to return', '10')
   .option('--json', 'Output results in JSON format')
-  .action(async (imagePath, options) => {
+  .action(async (imagePath: string, options: CliOptions) => {
     try {
       const fullPath = path.resolve(imagePath);
       const topK = parseInt(options.topK, 10);
