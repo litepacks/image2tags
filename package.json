@@ -51,7 +51,8 @@
   "dependencies": {
     "@tensorflow-models/mobilenet": "^2.1.1",
     "@tensorflow/tfjs-node": "^4.22.0",
-    "commander": "^14.0.0"
+    "commander": "^14.0.0",
+    "file-type": "^16.5.4"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",

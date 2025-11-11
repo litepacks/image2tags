@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { getImageTags } from './index';
+import { getImageTags, ImageTagOptions } from './index';
 import * as path from 'path';
 
 const program = new Command();
@@ -9,6 +9,8 @@ const program = new Command();
 interface CliOptions {
   topK: string;
   json?: boolean;
+  maxSize?: string;
+  model?: string;
 }
 
 program
@@ -17,16 +19,36 @@ program
   .argument('<imagePath>', 'Path to the image file.')
   .option('-k, --topK <number>', 'Number of top predictions to return', '10')
   .option('--json', 'Output results in JSON format')
+  .option('--max-size <bytes>', 'Maximum file size in bytes (e.g., 5242880 for 5MB)')
+  .option('--model <version>', 'MobileNet model version (1 or 2)', '2')
   .action(async (imagePath: string, options: CliOptions) => {
     try {
       const fullPath = path.resolve(imagePath);
       const topK = parseInt(options.topK, 10);
+      const maxFileSize = options.maxSize ? parseInt(options.maxSize, 10) : undefined;
+      const modelVersion = options.model ? parseInt(options.model, 10) as 1 | 2 : 2;
+
+      // Validate model version
+      if (modelVersion !== 1 && modelVersion !== 2) {
+        throw new Error('Model version must be 1 or 2');
+      }
+
+      // Validate max file size
+      if (maxFileSize !== undefined && (isNaN(maxFileSize) || maxFileSize <= 0)) {
+        throw new Error('Max file size must be a positive number');
+      }
       
       if (!options.json) {
         console.log('Processing image...');
       }
       
-      const tags = await getImageTags(fullPath, topK);
+      const tagOptions: ImageTagOptions = {
+        topK,
+        maxFileSize,
+        modelVersion
+      };
+
+      const tags = await getImageTags(fullPath, tagOptions);
 
       if (options.json) {
         console.log(JSON.stringify(tags, null, 2));
