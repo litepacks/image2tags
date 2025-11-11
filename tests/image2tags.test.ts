@@ -5,6 +5,7 @@ import * as fs from 'fs';
 describe('Image to Tags', () => {
   const fixturesPath = path.join(__dirname, 'fixtures');
   const imagePath = path.join(fixturesPath, 'sample.jpg');
+  const gifPath = path.join(fixturesPath, 'test.gif');
 
   beforeAll(() => {
     // Make sure the sample image file exists before running tests.
@@ -75,6 +76,14 @@ describe('Image to Tags', () => {
     
     expect(Array.isArray(tags)).toBe(true);
     expect(tags.length).toBeGreaterThan(0);
+  });
+
+  it('should reject GIF files as unsupported', async () => {
+    jest.setTimeout(30000);
+
+    if (fs.existsSync(gifPath)) {
+      await expect(getImageTags(gifPath)).rejects.toThrow(/Unsupported file type.*image\/gif/);
+    }
   });
 
   it('should throw an error if the image path is invalid', async () => {
